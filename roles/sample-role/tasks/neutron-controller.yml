@@ -1,0 +1,5 @@
+- name: Configure the neutron server in the controller manually and press enter
+  pause:
+
+- name: Restarting the Compute api service
+  service: name=openstack-nova-api state=restarted

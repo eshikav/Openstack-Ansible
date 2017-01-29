@@ -1,0 +1,11 @@
+- name: Installing the necessary packages for the Compute service
+  yum: name=openstack-nova-compute state=installed update_cache=yes
+
+- name: Configure the Nova service and press enter
+  pause:
+
+- name: Starting the services necessary for the Compute
+  service: name={{ item }} state=started enabled=yes
+  with_items:
+      - libvirtd
+      - openstack-nova-compute

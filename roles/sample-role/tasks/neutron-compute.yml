@@ -1,0 +1,16 @@
+- name: Installing the packages for the Networking service
+  yum: name={{ item }} state=installed update_cache=yes
+  with_items:
+      - openstack-neutron-linuxbridge 
+      - ebtables 
+      - ipset
+
+- name: Configuring the compute service to use the Networking
+  template: src={{ item.src }} dest={{ item.dest }}
+
+
+- name: Restarting the nova-compute service
+  service: name=neutron-linuxbridge-agent status=restarted
+
+- name: starting the linux-bridge agent
+  service: name=neutron-linuxbridge-agent status=started enabled=yes

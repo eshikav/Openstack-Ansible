@@ -1,0 +1,68 @@
+- name: Creating a database for the Keystone service
+  mysql_db: name=keystone state=present login_user={{ mysql_username }} login_password={{ mysql_root_password }} 
+  
+- name: Setting up permissions for the Keystone database
+  mysql_user:
+    name: "keystone"
+    password: {{ keystone_password }}
+    priv: "*.*:ALL,GRANT"
+    state: present
+    host: "{{ item }}"
+    login_user: "{{ mysql_username }}"
+    login_password: "{{ mysql_root_password }}"
+  with_items:
+    - "%"
+    - "localhost"
+	
+- name: Installing the packages for the Keystone service
+  yum: name={{ item }} state=installed
+  with_items:
+    - openstack-keystone 
+    - httpd 
+    - mod_wsgi
+	
+- name: Configuring the Keystone service
+  lineinfile: 
+    dest: "/etc/keystone/keystone.conf" 
+	regexp: "^[database]"
+	insertafter: "^#connection = mysql"
+	state: "present"
+	line: "connection = mysql+pymysql://keystone:{{ keystone_password }}@{{ ansible_hostname }}/keystone"
+	
+- name: Configuring the Keystone service
+  lineinfile: 
+    dest: "/etc/keystone/keystone.conf" 
+	regexp: "^[token]"
+	insertafter: "^#provider ="
+	state: "present"
+	line: "provider = fernet"
+	
+- name: Doing a database Sync for the Keystone Database
+  shell: su -s /bin/sh -c "keystone-manage db_sync" keystone
+  args:
+    creates: /root/.keystone_db_sync
+
+- name: Initializing the Fernet key repositories
+  shell: keystone-manage {{ item }} --keystone-user keystone --keystone-group keystone
+  with_items:
+    - fernet_setup
+    - credential_setup
+	
+- name: Bootstraping the Keystone Service
+  shell: keystone-manage bootstrap --bootstrap-password {{ admin_password }} --bootstrap-admin-url http://{{ ansible_hostname }}:35357/v3/ --bootstrap-internal-url http://{{ ansible_hostname }}:35357/v3/ --bootstrap-public-url http://{{ ansible_hostname }}:5000/v3/ --bootstrap-region-id RegionOne
+  
+- name: Configuring the httpd service
+  lineinfile: 
+    dest: "/etc/httpd/conf/httpd.conf" 
+	regexp: "^ServerName"
+	state: "present"
+	line: "ServerName {{ ansible_hostname }}"
+	
+- name: Creating a Softlink to the wsgi-keystone.conf
+  file: src="/usr/share/keystone/wsgi-keystone.conf" dest="/etc/httpd/conf.d/" state=link
+  
+- name: Starting the Apache Servie and Enabling them at the reboot
+  service: name=httpd state=started enabled=yes
+
+- name: Creating the admin.rc file in the /root directory
+  template: src=admin.rc dest=/root
