@@ -28,3 +28,5 @@ provider_interface:
 nova_host:
 metadata_proxy_shared_key:
 neutron_host:
+compute_provider_interface:
+compute_tunnel_ip_address:
