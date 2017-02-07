@@ -1,0 +1,30 @@
+http_proxy: "http://15.85.195.199:8080"
+NTP_SERVER: "controller"
+CLM_CIDR: "192.168.192.0/24"
+CONTROLLER_HOSTNAME: "controller"
+mysql_root_password: "redhat123@"
+rabbitmq_user: "openstack"
+rabbitmq_password: "redhat123@"
+role: "controller"
+mysql_username: "root"
+admin_password: "redhat123@"
+keystone_password: "redhat123@"
+glance_password: "redhat123@"
+database_host: 
+keystone_host:
+glance_db_password:
+memcached_host:
+glance_filesystem_store:
+nova_db_password:
+rabbitmq_host:
+glance_host:
+nova_password:
+nova_host_ip:
+nova_compute_host_ip:
+neutron_db_password:
+neutron_password:
+tunnel_ip_address:
+provider_interface:
+nova_host:
+metadata_proxy_shared_key:
+neutron_host:
