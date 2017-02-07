@@ -6,7 +6,7 @@
       - ipset
 
 - name: Configuring the compute service to use the Networking
-  template: src=network-{{ item.src }} dest={{ item.dest }}
+  template: src=network-{{ item.src }} dest={{ item.destination }}
   with_items:
       - { src: "linuxbridge_agent.ini",destination: "/etc/neutron/plugins/ml2/linuxbridge_agent.ini" }
       - { src: "neutron.conf", destination: "/etc/neutron/neutron.conf" }
