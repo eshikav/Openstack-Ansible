@@ -1,5 +1,5 @@
 [mysqld]
-bind-address = {{ CONTROLLER_HOSTNAME }}
+bind-address = {{ database_host }}
 default-storage-engine = innodb
 innodb_file_per_table
 max_connections = 4096

@@ -18,22 +18,22 @@
   os_user: name=glance domain=default password=redhat123@
   environment:
       - OS_USERNAME: "admin"
-      - OS_PASSWORD: "redhat123@"
+      - OS_PASSWORD: "{{ admin_password }}"
       - OS_PROJECT_NAME: "admin"
       - OS_USER_DOMAIN_NAME: "Default"
       - OS_PROJECT_DOMAIN_NAME: "Default"
-      - OS_AUTH_URL: "http://controller:35357/v3"
+      - OS_AUTH_URL: "http://{{ keystone_host }}:35357/v3"
       - OS_IDENTITY_API_VERSION: "3"
 
 - name: Assigning admin access to the Glance user
   os_user_role: user=glance role=admin project=service
   environment:
       - OS_USERNAME: "admin"
-      - OS_PASSWORD: "redhat123@"
+      - OS_PASSWORD: "{{ admin_password }}"
       - OS_PROJECT_NAME: "admin"
       - OS_USER_DOMAIN_NAME: "Default"
       - OS_PROJECT_DOMAIN_NAME: "Default"
-      - OS_AUTH_URL: "http://controller:35357/v3"
+      - OS_AUTH_URL: "http://{{ keystone_host }}:35357/v3"
       - OS_IDENTITY_API_VERSION: "3"
 
 - name: Creating the Glance service for the Openstack
@@ -44,15 +44,15 @@
      description: OpenStack Image Service
   environment:
       - OS_USERNAME: "admin"
-      - OS_PASSWORD: "redhat123@"
+      - OS_PASSWORD: "{{ admin_password }}"
       - OS_PROJECT_NAME: "admin"
       - OS_USER_DOMAIN_NAME: "Default"
       - OS_PROJECT_DOMAIN_NAME: "Default"
-      - OS_AUTH_URL: "http://controller:35357/v3"
+      - OS_AUTH_URL: "http://{{ keystone_host }}:35357/v3"
       - OS_IDENTITY_API_VERSION: "3"
 
 - name: Creating the endpoints for the Glance Service
-  shell: openstack endpoint create --region RegionOne image {{ item }} http://controller:9292 && touch /root/.glance-{{ item }}-endpoint
+  shell: openstack endpoint create --region RegionOne image {{ item }} http://{{ glance_host }}:9292 && touch /root/.glance-{{ item }}-endpoint
   args:
      creates: /root/.glance-{{ item }}-endpoint
   with_items:

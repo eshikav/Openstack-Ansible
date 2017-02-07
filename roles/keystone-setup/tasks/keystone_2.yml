@@ -2,22 +2,22 @@
   os_project: name=shiva domain=default description="Shiva Project"
   environment:
       - OS_USERNAME: "admin"
-      - OS_PASSWORD: "redhat123@"
+      - OS_PASSWORD: "{{ admin_password }}"
       - OS_PROJECT_NAME: "admin"
       - OS_USER_DOMAIN_NAME: "Default"
       - OS_PROJECT_DOMAIN_NAME: "Default"
-      - OS_AUTH_URL: "http://controller:35357/v3"
+      - OS_AUTH_URL: "http://{{ keystone_host }}:35357/v3"
       - OS_IDENTITY_API_VERSION: "3"
 
 - name: Creating the admin.rc file in the /root directory
   os_project: name={{ item.name }} domain=default description={{ item.description }}
   environment:
       - OS_USERNAME: "admin"
-      - OS_PASSWORD: "redhat123@"
+      - OS_PASSWORD: "{{ admin_password }}"
       - OS_PROJECT_NAME: "admin"
       - OS_USER_DOMAIN_NAME: "Default"
       - OS_PROJECT_DOMAIN_NAME: "Default"
-      - OS_AUTH_URL: "http://controller:35357/v3"
+      - OS_AUTH_URL: "http://{{ keystone_host }}:35357/v3"
       - OS_IDENTITY_API_VERSION: "3"
   with_items:
       - { name: "service",description: "Service Project" }
@@ -28,11 +28,11 @@
   os_user: name={{ item.name }} domain=default password={{ item.password }}
   environment:
       - OS_USERNAME: "admin"
-      - OS_PASSWORD: "redhat123@"
+      - OS_PASSWORD: "{{ admin_password }}"
       - OS_PROJECT_NAME: "admin"
       - OS_USER_DOMAIN_NAME: "Default"
       - OS_PROJECT_DOMAIN_NAME: "Default"
-      - OS_AUTH_URL: "http://controller:35357/v3"
+      - OS_AUTH_URL: "http://{{ keystone_host }}:35357/v3"
       - OS_IDENTITY_API_VERSION: "3"
   with_items:
       - { name: "user",password: "redhat123@" }
@@ -42,22 +42,22 @@
   os_keystone_role: state=present name=user
   environment:
       - OS_USERNAME: "admin"
-      - OS_PASSWORD: "redhat123@"
+      - OS_PASSWORD: "{{ admin_password }}"
       - OS_PROJECT_NAME: "admin"
       - OS_USER_DOMAIN_NAME: "Default"
       - OS_PROJECT_DOMAIN_NAME: "Default"
-      - OS_AUTH_URL: "http://controller:35357/v3"
+      - OS_AUTH_URL: "http://{{ keystone_host }}:35357/v3"
       - OS_IDENTITY_API_VERSION: "3"
 
 - name: Assigning the roles to the users
   os_user_role: user=user role=admin project=demo
   environment:
       - OS_USERNAME: "admin"
-      - OS_PASSWORD: "redhat123@"
+      - OS_PASSWORD: "{{ admin_password }}"
       - OS_PROJECT_NAME: "admin"
       - OS_USER_DOMAIN_NAME: "Default"
       - OS_PROJECT_DOMAIN_NAME: "Default"
-      - OS_AUTH_URL: "http://controller:35357/v3"
+      - OS_AUTH_URL: "http://{{ keystone_host }}:35357/v3"
       - OS_IDENTITY_API_VERSION: "3"
 
 - name: Copying the Client side scripts for authentication

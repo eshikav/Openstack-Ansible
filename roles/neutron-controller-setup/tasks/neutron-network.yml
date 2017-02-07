@@ -18,22 +18,22 @@
   os_user: name=neutron domain=default password=redhat123@
   environment:
       - OS_USERNAME: "admin"
-      - OS_PASSWORD: "redhat123@"
+      - OS_PASSWORD: "{{ admin_password }}"
       - OS_PROJECT_NAME: "admin"
       - OS_USER_DOMAIN_NAME: "Default"
       - OS_PROJECT_DOMAIN_NAME: "Default"
-      - OS_AUTH_URL: "http://controller:35357/v3"
+      - OS_AUTH_URL: "http://{{ keystone_host }}:35357/v3"
       - OS_IDENTITY_API_VERSION: "3"
 
 - name: Assigning admin access to the Neutron user 
   os_user_role: user=neutron role=admin project=service
   environment:
       - OS_USERNAME: "admin"
-      - OS_PASSWORD: "redhat123@"
+      - OS_PASSWORD: "{{ admin_password }}"
       - OS_PROJECT_NAME: "admin"
       - OS_USER_DOMAIN_NAME: "Default"
       - OS_PROJECT_DOMAIN_NAME: "Default"
-      - OS_AUTH_URL: "http://controller:35357/v3"
+      - OS_AUTH_URL: "http://{{ keystone_host }}:35357/v3"
       - OS_IDENTITY_API_VERSION: "3"
 
 - name: Creating the Neutron service for the Openstack Cloud
@@ -44,15 +44,15 @@
      description: OpenStack networking Service
   environment:
       - OS_USERNAME: "admin"
-      - OS_PASSWORD: "redhat123@"
+      - OS_PASSWORD: "{{ admin_password }}"
       - OS_PROJECT_NAME: "admin"
       - OS_USER_DOMAIN_NAME: "Default"
       - OS_PROJECT_DOMAIN_NAME: "Default"
-      - OS_AUTH_URL: "http://controller:35357/v3"
+      - OS_AUTH_URL: "http://{{ keystone_host }}:35357/v3"
       - OS_IDENTITY_API_VERSION: "3"
 
-- name: Creating the endpoints for the Glance Service
-  shell: openstack endpoint create --region RegionOne image {{ item }} http://controller:9696 && touch /root/.neutron-{{ item }}-endpoint
+- name: Creating the endpoints for the Neutron Service
+  shell: openstack endpoint create --region RegionOne image {{ item }} http://{{ neutron_host }}:9696 && touch /root/.neutron-{{ item }}-endpoint
   args:
      creates: /root/.neutron-{{ item }}-endpoint
   with_items:
@@ -61,7 +61,7 @@
       - admin
 
 
-- name: Installing the required packages for the Nova service
+- name: Installing the required packages for the Neutron service
   yum: name={{ item }} state=installed update_cache=yes
   with_items:
     - openstack-neutron 
@@ -69,7 +69,7 @@
     - openstack-neutron-linuxbridge 
     - ebtables
 
-- name: configuring the Nova Service
+- name: configuring the Neutron Service
   template: src=network-{{ item.source }} dest={{ item.destination }}
   with_items:
       - { source: "neutron.conf",destination: "/etc/neutron/neutron.conf" }
@@ -81,7 +81,7 @@
 - name: Creating a soft link for the ml2 plugin
   file: src=/etc/neutron/plugins/ml2/ml2_conf.ini path=/etc/neutron/plugin.ini state=link
 
-- name: Doing a database sync for Nova Service
+- name: Doing a database sync for Neutron Service
   command: '/bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron'
 
 - name: setting up the permissions for the Neutron logs

@@ -5,8 +5,6 @@
     - mariadb-server
     - python2-PyMySQL
     - MySQL-python
-  environment:
-     http_proxy: "{{ http_proxy }}"
 
 - name: Configuring the mysql server for the Openstack services
   template: src=openstack.cnf dest=/etc/my.cnf.d/
@@ -18,7 +16,7 @@
   mysql_user: user=root password="{{ mysql_root_password }}" host=localhost
 
 - name: Deletes anonymous MySQL server user for ansible_fqdn
-  mysql_user: user="" host="{{ ansible_hostname }}" state=absent
+  mysql_user: user="" host="{{ database_host }}" state=absent
 
 - name: Deletes anonymous MySQL server user for localhost
   mysql_user: user="" state="absent"
@@ -33,7 +31,7 @@
   mysql_user: user="root" password="{{ mysql_root_password }}" host="localhost"
 
 - name: Secures the MySQL root user for server_hostname domain
-  mysql_user: user="root" password="{{ mysql_root_password }}" host="{{ ansible_hostname }}"
+  mysql_user: user="root" password="{{ mysql_root_password }}" host="{{ database_host }}"
 
 - name: Removes the MySQL test database
   mysql_db: db=test state=absent
